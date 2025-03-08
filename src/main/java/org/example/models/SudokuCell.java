@@ -1,19 +1,19 @@
 package org.example.models;
 
-public class SudokuValue {
+public class SudokuCell {
     private int index;
     private int row;
     private int col;
     private Integer value;
     private boolean isFixed;
 
-    public SudokuValue(int index, Integer value, boolean isFixed) {
+    public SudokuCell(int index, Integer value, boolean isFixed) {
         this.index = index;
         this.value = value;
         this.isFixed = isFixed;
     }
 
-    public SudokuValue(int row, int col, int index, Integer value, boolean isFixed) {
+    public SudokuCell(int row, int col, int index, Integer value, boolean isFixed) {
         this.row = row;
         this.col = col;
         this.index = index;
@@ -21,7 +21,7 @@ public class SudokuValue {
         this.isFixed = isFixed;
     }
 
-    public SudokuValue getSudokuValue() {
+    public SudokuCell getSudokuCell() {
         return this;
     }
 
