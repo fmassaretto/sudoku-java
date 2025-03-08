@@ -1,5 +1,8 @@
 package org.example.models;
 
+import org.example.exceptions.DuplicateValueException;
+import org.example.exceptions.InvalidMoveException;
+import org.example.exceptions.UserInputNumberOutOfRangeException;
 import org.example.utils.SudokuUtils;
 
 import java.util.ArrayList;
@@ -13,7 +16,6 @@ public class Sudoku extends SudokuUtils {
     private static final short SUDOKU_SIZE = 9; // Size of sudoku board, eg. 9x9
     private static final int SUDOKU_BLOCKS_COUNT = calculateBlocksPerLineAndColumn(SUDOKU_SIZE);
     private List<SudokuBlock> sudokuBlocks;
-//    private  sudokuBlocks2;
 
     public Sudoku() {
         this.sudokuBlocks = createSudokuBlocks();
@@ -30,7 +32,7 @@ public class Sudoku extends SudokuUtils {
                 int col = Integer.parseInt(lineSplit[2]);
                 int value = Integer.parseInt(lineSplit[3]);
 
-                int index = translateRowColumnsToIndex(row, col);
+                int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
 
                 sudokuBlocks.get(blockNumber).setValueToBlock(index, value, true);
             }
@@ -45,24 +47,24 @@ public class Sudoku extends SudokuUtils {
         return sudokuBlocks;
     }
 
-    public void placeNumberInSudoku(Integer blockNumber, int row, int col, int value) {
+    public void placeNumberInSudoku(Integer blockNumber, int row, int col, int value) throws UserInputNumberOutOfRangeException, InvalidMoveException, DuplicateValueException {
         validateNumber(value);
         checkForFixedValue(blockNumber, row, col);
         checkPositionHasAlreadyValue(blockNumber, row, col);
         boolean isValidMove = isValidMove(blockNumber, row, col, value);
 
         if (!isValidMove) {
-            throw new IllegalArgumentException("Invalid move");
+            throw new InvalidMoveException("Invalid move");
         }
 
-        int index = translateRowColumnsToIndex(row, col);
+        int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
 
         sudokuBlocks.get(blockNumber).setValueToBlock(index, value);
 
         draw();
     }
 
-    private boolean isValidMove(Integer blockNumber, int row, int col, int value) {
+    private boolean isValidMove(Integer blockNumber, int row, int col, int value) throws DuplicateValueException {
         if (isNull(blockNumber)) {
             return checkWithPositionsOnly(row, col, value);
         } else {
@@ -74,39 +76,27 @@ public class Sudoku extends SudokuUtils {
         return false; // TODO: do all logic here
     }
 
-    private boolean checkWithBlockNumber(Integer blockNumber, int row, int col, int value) {
+    private boolean checkWithBlockNumber(Integer blockNumber, int row, int col, int value) throws DuplicateValueException {
         // check inside the block if the number that the user passed already exists in it
         SudokuBlock sudokuBlock = sudokuBlocks.get(blockNumber);
-        boolean hasValueInBlock = sudokuBlock.getValues().stream().noneMatch(s -> !isNull(s.getSudokuValue().getValue()) && s.getSudokuValue().getValue().equals(value));
+        boolean hasValueInBlock = sudokuBlock.getSudokuCells().stream().noneMatch(s -> !isNull(s.getSudokuCell().getValue()) && s.getSudokuCell().getValue().equals(value));
         // check the row in all blocks that the row traverse if the number that the user passed already exists
-        checkIfValueIsUniqueInRow(blockNumber, row, value);
+//        checkForUniqueValueInRow(blockNumber, row, value);
+//        checkForUniqueValueInRowOrColumn(blockNumber, col, value);
+        checkForUniqueValueInRowOrColumn(blockNumber, Directions.ROW, row, value);
+        checkForUniqueValueInRowOrColumn(blockNumber, Directions.COLUMN, col, value);
         // check the column in all blocks that the column traverse if the number that the user passed already exists
 
         return hasValueInBlock;
     }
 
-    private void checkIfValueIsUniqueInRow(int blockNumber, int row, int value) {
-        List<SudokuBlock> neighbourBlocks = getNeighbourBlocksRow(blockNumber);
-        int blockColSize = 3;
-
-        for (int col = 0; col < blockColSize; col++) {
-            int finalCol = col;
-            neighbourBlocks.forEach(v -> {
-                Integer valueInsideBlock = v.getValueByRowAndCol(row, finalCol).getValue();
-                if(nonNull(valueInsideBlock)) {
-                    if (valueInsideBlock == value) {
-                        throw new IllegalArgumentException("The value %d is already in the row".formatted(value));
-                    }
-                }
-            });
-        }
-    }
-
+    // For the value inside a block that the user is placing this method gets all neighbour blocks
+    // to later check all values in the row for each block
     private List<SudokuBlock> getNeighbourBlocksRow(int blockNumber) {
         int count = 0;
         List<SudokuBlock> neighbourBlocks = new ArrayList<>();
-        while (count < SUDOKU_SIZE){
-            if(blockNumber <= (count + SUDOKU_BLOCKS_COUNT)) {
+        while (count < SUDOKU_SIZE) {
+            if (blockNumber < (count + SUDOKU_BLOCKS_COUNT)) {
                 for (int i = count; i < (count + SUDOKU_BLOCKS_COUNT); i++) {
                     neighbourBlocks.add(sudokuBlocks.get(i));
                 }
@@ -117,30 +107,64 @@ public class Sudoku extends SudokuUtils {
         return neighbourBlocks;
     }
 
-    public void getNeighbourBlocksColumn(int row, int col) {
+    private void checkForUniqueValueInRowOrColumn(Integer blockNumber, Directions direction, int rowOrCol, int value) throws DuplicateValueException {
+        int blockRowColSize = 3;
+        boolean isDirectionRow = direction.equals(Directions.ROW);
 
+        List<SudokuBlock> neighbourBlocks = isDirectionRow ? getNeighbourBlocksRow(blockNumber) : getNeighbourBlocksColumn(blockNumber);
+
+        for (int i = 0; i < blockRowColSize; i++) {
+            for (SudokuBlock v : neighbourBlocks) {
+                Integer valueInsideBlock = isDirectionRow ?
+                        v.getSudokuCellByRowAndCol(rowOrCol, i).getValue() :
+                        v.getSudokuCellByRowAndCol(i, rowOrCol).getValue();
+
+                if (nonNull(valueInsideBlock) && valueInsideBlock == value) {
+                    throw new DuplicateValueException("The value %d is already in the %s"
+                            .formatted(value, isDirectionRow ? "row" : "column"));
+                }
+            }
+        }
     }
 
-    private void validateNumber(int value) {
+    public List<SudokuBlock> getNeighbourBlocksColumn(int blockNumber) {
+        List<SudokuBlock> neighbourBlocks = List.of();
+        int index = 0;
+        for (int i = 0; i < SUDOKU_BLOCKS_COUNT; i++) {
+            index = i;
+            neighbourBlocks = new ArrayList<>();
+            for (int j = 0; j < SUDOKU_BLOCKS_COUNT; j++) {
+                neighbourBlocks.add(sudokuBlocks.get(index));
+                index += SUDOKU_BLOCKS_COUNT;
+            }
+
+            if (neighbourBlocks.contains(sudokuBlocks.get(blockNumber))) {
+                break;
+            }
+        }
+        return neighbourBlocks;
+    }
+
+    private void validateNumber(int value) throws UserInputNumberOutOfRangeException {
         if (value < 1 || value > 9) {
-            throw new IllegalArgumentException("Number must be between 1 and 9");
+            throw new UserInputNumberOutOfRangeException("Number must be between 1 and 9");
         }
     }
 
     private void checkForFixedValue(int blockNumber, int row, int col) {
-        int index = translateRowColumnsToIndex(row, col);
-        SudokuValue getSudokuValue = sudokuBlocks.get(blockNumber).getValueAtIndex(index);
+        int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
+        SudokuCell getSudokuCell = sudokuBlocks.get(blockNumber).getSudokuCellAtIndex(index);
 
-        if (getSudokuValue.isFixed()) {
+        if (getSudokuCell.isFixed()) {
             throw new IllegalArgumentException("This position has a fixed value");
         }
     }
 
     private void checkPositionHasAlreadyValue(int blockNumber, int row, int col) {
-        int index = translateRowColumnsToIndex(row, col);
-        SudokuValue getSudokuValue = sudokuBlocks.get(blockNumber).getValueAtIndex(index);
+        int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
+        SudokuCell getSudokuCell = sudokuBlocks.get(blockNumber).getSudokuCellAtIndex(index);
 
-        if (getSudokuValue.getValue() != null) {
+        if (getSudokuCell.getValue() != null) {
             throw new IllegalArgumentException("This position has already a value");
         }
     }
@@ -156,8 +180,8 @@ public class Sudoku extends SudokuUtils {
                 for (int blockIdx = 0; blockIdx < SUDOKU_BLOCKS_COUNT; blockIdx++) { // this keep track of SudokuBlock object in the list
                     for (int col = 0; col < 3; col++) { // for each block this goes in every column of the block
                         // get sudokuBlock by index of the SUDOKU_BLOCKS_COUNT (eg.: 3) and draw the row
-                        int index = translateRowColumnsToIndex(row, col);
-                        Integer value = sudokuBlocks.get(blockLine * SUDOKU_BLOCKS_COUNT + blockIdx).getValueAtIndex(index).getValue();
+                        int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
+                        Integer value = sudokuBlocks.get(blockLine * SUDOKU_BLOCKS_COUNT + blockIdx).getSudokuCellAtIndex(index).getValue();
                         System.out.print(!isNull(value) ? value + "    " : "     ");
                     }
                     System.out.print("||    ");

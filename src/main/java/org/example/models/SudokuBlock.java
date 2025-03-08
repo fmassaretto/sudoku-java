@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.example.utils.SudokuUtils.translateRowColumnsToIndex;
+import static org.example.utils.SudokuUtils.translateBlockRowsAndColumnsToBoardIndex;
 
 /*
  *
@@ -14,36 +14,31 @@ import static org.example.utils.SudokuUtils.translateRowColumnsToIndex;
 public class SudokuBlock {
 
     private Integer blockNumber = 0;
-
-    //    private int randomValueToFill;
-//    private SudokuValue[][] sudokuValues;
-    private List<SudokuValue> sudokuValueList;
+    private List<SudokuCell> sudokuCellList;
 
     public SudokuBlock() {
     }
 
     public SudokuBlock(int blockNumber) {
         this.blockNumber = blockNumber;
-//        sudokuValues = new SudokuValue[ROWS][COLS];
-        sudokuValueList = new ArrayList<>();
+
+        sudokuCellList = new ArrayList<>();
 
         generateInitialSudokuBlock();
     }
 
-    public void setValueToBlock(int index, Integer value, boolean isFixed) {
-//        sudokuValues[row][col] = new SudokuValue(value, isFixed);
-        SudokuValue sudokuValue = sudokuValueList.get(index);
-        sudokuValue.setValue(value);
-        sudokuValue.setFixed(isFixed);
-        sudokuValueList.set(index, sudokuValue);
+    public void setSudokuCellToBlock(int index, Integer value, boolean isFixed) {
+        SudokuCell sudokuCell = sudokuCellList.get(index);
+        sudokuCell.setValue(value);
+        sudokuCell.setFixed(isFixed);
+        sudokuCellList.set(index, sudokuCell);
     }
 
-    public void setValueToBlock(int index, Integer value) {
-//        sudokuValues[row][col] = new SudokuValue(value, false);
-        SudokuValue sudokuValue = sudokuValueList.get(index);
-        sudokuValue.setValue(value);
-        sudokuValue.setFixed(false);
-        sudokuValueList.set(index, sudokuValue);
+    public void setSudokuCellToBlock(int index, Integer value) {
+        SudokuCell sudokuCell = sudokuCellList.get(index);
+        sudokuCell.setValue(value);
+        sudokuCell.setFixed(false);
+        sudokuCellList.set(index, sudokuCell);
     }
 
     private void generateInitialSudokuBlock() {
@@ -51,32 +46,21 @@ public class SudokuBlock {
         int COLS = 3;
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
-                int index = translateRowColumnsToIndex(row, col);
-                sudokuValueList.add(new SudokuValue(row, col, index, null, false));
-//                setValueToBlock(row, col, null, false);
+                int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
+                sudokuCellList.add(new SudokuCell(row, col, index, null, false));
             }
         }
     }
 
-    public int getBlockNumber() {
-        return blockNumber;
+    public SudokuCell getSudokuCellByRowAndCol(int row, int col) {
+        return sudokuCellList.stream().filter(s -> s.getSudokuCell().getRow() == row && s.getSudokuCell().getCol() == col).findFirst().orElse(null);
     }
 
-//    public void setValueAtPosition(int row, int col, int value) {
-//        sudokuBlock[row][col].setValue(value);
-//    }
-
-    public SudokuValue getValueByRowAndCol(int row, int col) {
-        return sudokuValueList.stream().filter(s -> s.getSudokuValue().getRow() == row && s.getSudokuValue().getCol() == col).findFirst().orElse(null);
-//        return sudokuValues[row][col];
+    public SudokuCell getSudokuCellAtIndex(int index) {
+        return sudokuCellList.stream().filter(s -> s.getSudokuCell().getIndex() == index).findFirst().orElse(null);
     }
 
-    public SudokuValue getValueAtIndex(int index) {
-        return sudokuValueList.stream().filter(s -> s.getSudokuValue().getIndex() == index).findFirst().orElse(null);
-//        return sudokuValues[row][col];
-    }
-
-    public List<SudokuValue> getValues() {
-        return sudokuValueList.stream().map(SudokuValue::getSudokuValue).collect(Collectors.toList());
+    public List<SudokuCell> getSudokuCells() {
+        return sudokuCellList.stream().map(SudokuCell::getSudokuCell).collect(Collectors.toList());
     }
 }
