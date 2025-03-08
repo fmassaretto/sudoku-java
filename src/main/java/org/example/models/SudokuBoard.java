@@ -12,18 +12,18 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-public class Sudoku extends SudokuUtils {
-    private static final short SUDOKU_SIZE = 9; // Size of sudoku board, eg. 9x9
+public class SudokuBoard extends SudokuUtils {
+    private static final short SUDOKU_SIZE = 9; // Size of sudoku board, e.g.: 3x3 = 9, 4x4 = 16 and so on
     private static final int SUDOKU_BLOCKS_COUNT = calculateBlocksPerLineAndColumn(SUDOKU_SIZE);
     private List<SudokuBlock> sudokuBlocks;
 
-    public Sudoku() {
+    public SudokuBoard() {
         this.sudokuBlocks = createSudokuBlocks();
 
-        fillSudokuWithInitialValuesFromTemplate();
+        fillSudokuBlockWithInitialSudokuCellFromTemplate();
     }
 
-    private void fillSudokuWithInitialValuesFromTemplate() {
+    private void fillSudokuBlockWithInitialSudokuCellFromTemplate() {
         requireNonNull(readSudokuTemplateFile()).forEach(s -> {
             if (!s.startsWith("#")) {
                 String[] lineSplit = s.split(",");
@@ -34,7 +34,7 @@ public class Sudoku extends SudokuUtils {
 
                 int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
 
-                sudokuBlocks.get(blockNumber).setValueToBlock(index, value, true);
+                sudokuBlocks.get(blockNumber).setSudokuCellToBlock(index, value, true);
             }
         });
     }
@@ -59,7 +59,7 @@ public class Sudoku extends SudokuUtils {
 
         int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
 
-        sudokuBlocks.get(blockNumber).setValueToBlock(index, value);
+        sudokuBlocks.get(blockNumber).setSudokuCellToBlock(index, value);
 
         draw();
     }
@@ -79,13 +79,16 @@ public class Sudoku extends SudokuUtils {
     private boolean checkWithBlockNumber(Integer blockNumber, int row, int col, int value) throws DuplicateValueException {
         // check inside the block if the number that the user passed already exists in it
         SudokuBlock sudokuBlock = sudokuBlocks.get(blockNumber);
-        boolean hasValueInBlock = sudokuBlock.getSudokuCells().stream().noneMatch(s -> !isNull(s.getSudokuCell().getValue()) && s.getSudokuCell().getValue().equals(value));
+
+        boolean hasValueInBlock = sudokuBlock
+                .getSudokuCells()
+                .stream()
+                .noneMatch(s -> !isNull(s.getSudokuCell().getValue()) && s.getSudokuCell().getValue().equals(value));
+
         // check the row in all blocks that the row traverse if the number that the user passed already exists
-//        checkForUniqueValueInRow(blockNumber, row, value);
-//        checkForUniqueValueInRowOrColumn(blockNumber, col, value);
         checkForUniqueValueInRowOrColumn(blockNumber, Directions.ROW, row, value);
-        checkForUniqueValueInRowOrColumn(blockNumber, Directions.COLUMN, col, value);
         // check the column in all blocks that the column traverse if the number that the user passed already exists
+        checkForUniqueValueInRowOrColumn(blockNumber, Directions.COLUMN, col, value);
 
         return hasValueInBlock;
     }
@@ -129,7 +132,7 @@ public class Sudoku extends SudokuUtils {
 
     public List<SudokuBlock> getNeighbourBlocksColumn(int blockNumber) {
         List<SudokuBlock> neighbourBlocks = List.of();
-        int index = 0;
+        int index;
         for (int i = 0; i < SUDOKU_BLOCKS_COUNT; i++) {
             index = i;
             neighbourBlocks = new ArrayList<>();
@@ -151,21 +154,21 @@ public class Sudoku extends SudokuUtils {
         }
     }
 
-    private void checkForFixedValue(int blockNumber, int row, int col) {
+    private void checkForFixedValue(int blockNumber, int row, int col) throws InvalidMoveException {
         int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
         SudokuCell getSudokuCell = sudokuBlocks.get(blockNumber).getSudokuCellAtIndex(index);
 
         if (getSudokuCell.isFixed()) {
-            throw new IllegalArgumentException("This position has a fixed value");
+            throw new InvalidMoveException("This cell has a fixed value");
         }
     }
 
-    private void checkPositionHasAlreadyValue(int blockNumber, int row, int col) {
+    private void checkPositionHasAlreadyValue(int blockNumber, int row, int col) throws InvalidMoveException {
         int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
         SudokuCell getSudokuCell = sudokuBlocks.get(blockNumber).getSudokuCellAtIndex(index);
 
         if (getSudokuCell.getValue() != null) {
-            throw new IllegalArgumentException("This position has already a value");
+            throw new InvalidMoveException("This position has already a value");
         }
     }
 
@@ -191,37 +194,5 @@ public class Sudoku extends SudokuUtils {
             System.out.print("    =======");
             System.out.println("===================".repeat(SUDOKU_BLOCKS_COUNT));
         }
-//            System.out.println("==%d==%d==%d==".formatted((counter), (counter + 1), (counter + 2)).repeat(SUDOKU_BLOCKS_COUNT));
-//            counter += 3;
     }
-//private static final short SUDOKU_SIZE = 9; // Standard 9x9 Sudoku
-//    private static final int BLOCK_SIZE = 3; // Each sub-grid is 3x3
-//    private final List<SudokuBlock> sudokuBlocks;
-//
-//    public Sudoku() {
-//        this.sudokuBlocks = new ArrayList<>();
-//        initializeSudokuGrid();
-//    }
-//
-//    private void initializeSudokuGrid() {
-//        for (int i = 0; i < SUDOKU_SIZE; i++) {
-//            sudokuBlocks.add(new SudokuBlock());
-//        }
-//    }
-
-//    public void draw() {
-//        for (int bigRow = 0; bigRow < BLOCK_SIZE; bigRow++) {
-//            for (int row = 0; row < BLOCK_SIZE; row++) {
-//                for (int bigCol = 0; bigCol < BLOCK_SIZE; bigCol++) {
-//                    for (int col = 0; col < BLOCK_SIZE; col++) {
-//                        System.out.print(sudokuBlocks.get(bigRow * BLOCK_SIZE + bigCol)
-//                                .getValueAtPosition(row, col) + " ");
-//                    }
-//                    System.out.print(" | "); // Separate blocks
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("----------------------"); // Separate 3x3 groups
-//        }
-//    }
 }
