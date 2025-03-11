@@ -1,4 +1,8 @@
 package org.example.models;
 
-public class GameStatus {
+public enum GameStatus {
+    STARTED,
+    FINISHED,
+    NOT_STARTED,
+    EXITED
 }
