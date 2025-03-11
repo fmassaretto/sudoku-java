@@ -11,7 +11,7 @@ public class SudokuUtils {
     public static final String GAME_WARNING_DISPLAY = "Warning ----> ";
     public static final String GAME_SUCCESS_DISPLAY = "Success ----> ";
 
-    public SudokuUtils() throws IllegalBlockStateException {
+    public SudokuUtils() {
     }
 
     public int calculateBlocksPerLineAndColumn(int totalBlocks) throws IllegalBlockStateException {
