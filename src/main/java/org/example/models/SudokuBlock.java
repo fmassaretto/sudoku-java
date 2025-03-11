@@ -1,10 +1,11 @@
 package org.example.models;
 
+import org.example.utils.SudokuUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.example.utils.SudokuUtils.translateBlockRowsAndColumnsToBoardIndex;
 
 /*
  *
@@ -15,12 +16,11 @@ public class SudokuBlock {
 
     private Integer blockNumber = 0;
     private List<SudokuCell> sudokuCellList;
+    private SudokuUtils sudokuUtils;
 
-    public SudokuBlock() {
-    }
-
-    public SudokuBlock(int blockNumber) {
+    public SudokuBlock(int blockNumber, SudokuUtils sudokuUtils) {
         this.blockNumber = blockNumber;
+        this.sudokuUtils = sudokuUtils;
 
         sudokuCellList = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class SudokuBlock {
         int COLS = 3;
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
-                int index = translateBlockRowsAndColumnsToBoardIndex(row, col);
+                int index = sudokuUtils.translateBlockRowsAndColumnsToBoardIndex(row, col);
                 sudokuCellList.add(new SudokuCell(row, col, index, null, false));
             }
         }
@@ -62,5 +62,13 @@ public class SudokuBlock {
 
     public List<SudokuCell> getSudokuCells() {
         return sudokuCellList.stream().map(SudokuCell::getSudokuCell).collect(Collectors.toList());
+    }
+
+    public Optional<SudokuCell> deleteSudokuCell(int index) {
+        Optional<SudokuCell> sudokuCell = sudokuCellList.stream().filter(cell -> cell.getValue() != null && cell.getSudokuCell().getIndex() == index).findFirst();
+
+        sudokuCell.ifPresent(cell -> cell.setValue(null));
+
+        return sudokuCell;
     }
 }
