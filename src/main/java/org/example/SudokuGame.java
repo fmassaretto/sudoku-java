@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class SudokuGame {
     private final Scanner sc = new Scanner(System.in);
-    private SudokuBoard sudokuBoard;
+    private final SudokuBoard sudokuBoard;
     short sudokuBoardSize = 9;
 
     public SudokuGame() throws IllegalBlockStateException {
@@ -64,12 +64,10 @@ public class SudokuGame {
     }
 
     private void showGame() {
-        System.out.println("showGame()");
         sudokuBoard.draw();
     }
 
     private void removeNumber() {
-        System.out.println("removeNumber()");
         try {
             System.out.print("Digite o número do bloco : ");
             int blockNumber = sc.nextInt();
@@ -88,7 +86,6 @@ public class SudokuGame {
     }
 
     private void fillNumber() {
-        System.out.println("fillNumber()");
         try {
             System.out.print("Digite o número do bloco : ");
             int blockNumber = sc.nextInt();
