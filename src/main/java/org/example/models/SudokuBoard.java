@@ -50,7 +50,7 @@ public class SudokuBoard extends SudokuUtils {
     private List<SudokuBlock> createSudokuBlocks() {
         sudokuBlocks = new ArrayList<>();
         for (int blockNumber = 0; blockNumber < SUDOKU_BOARD_SIZE; blockNumber++) {
-            sudokuBlocks.add(new SudokuBlock(blockNumber, sudokuUtils));
+            sudokuBlocks.add(new SudokuBlock(sudokuUtils));
         }
         return sudokuBlocks;
     }
@@ -89,6 +89,7 @@ public class SudokuBoard extends SudokuUtils {
 
         System.out.println();
         System.out.printf(GAME_SUCCESS_DISPLAY + "The number %d was removed!", numberBefore);
+        System.out.println();
     }
 
     private void isValidMove(Integer blockNumber, int row, int col, int value) throws DuplicateValueException, InvalidMoveException {

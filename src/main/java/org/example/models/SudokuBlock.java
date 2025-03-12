@@ -14,12 +14,10 @@ import java.util.stream.Collectors;
  * */
 public class SudokuBlock {
 
-    private Integer blockNumber = 0;
-    private List<SudokuCell> sudokuCellList;
-    private SudokuUtils sudokuUtils;
+    private final List<SudokuCell> sudokuCellList;
+    private final SudokuUtils sudokuUtils;
 
-    public SudokuBlock(int blockNumber, SudokuUtils sudokuUtils) {
-        this.blockNumber = blockNumber;
+    public SudokuBlock(SudokuUtils sudokuUtils) {
         this.sudokuUtils = sudokuUtils;
 
         sudokuCellList = new ArrayList<>();

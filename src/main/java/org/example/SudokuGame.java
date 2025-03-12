@@ -83,8 +83,8 @@ public class SudokuGame {
             System.out.println();
             System.out.println(e.getMessage());
             System.out.println();
-            sudokuBoard.draw();
         }
+        sudokuBoard.draw();
     }
 
     private void fillNumber() {
@@ -100,13 +100,11 @@ public class SudokuGame {
             int value = sc.nextInt();
 
             sudokuBoard.placeNumber(blockNumber, row, col, value);
-
-            sudokuBoard.draw();
         } catch (UserInputNumberOutOfRangeException | InvalidMoveException | DuplicateValueException e) {
             System.out.println();
             System.out.println(e.getMessage());
             System.out.println();
-            sudokuBoard.draw();
         }
+        sudokuBoard.draw();
     }
 }
