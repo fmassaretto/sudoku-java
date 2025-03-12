@@ -1,4 +1,4 @@
-package org.example.models;
+package org.example.domains;
 
 public class SudokuAbout {
     private SudokuAbout() {

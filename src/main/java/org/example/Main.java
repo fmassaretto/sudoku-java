@@ -1,9 +1,9 @@
 package org.example;
 
 import org.example.exceptions.IllegalBlockStateException;
-import org.example.models.GameStatus;
-import org.example.models.SudokuAbout;
-import org.example.models.SudokuHelp;
+import org.example.domains.GameStatus;
+import org.example.domains.SudokuAbout;
+import org.example.domains.SudokuHelp;
 
 import java.util.Scanner;
 

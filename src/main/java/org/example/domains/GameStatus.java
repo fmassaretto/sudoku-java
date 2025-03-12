@@ -1,4 +1,4 @@
-package org.example.models;
+package org.example.domains;
 
 public enum GameStatus {
     STARTED,

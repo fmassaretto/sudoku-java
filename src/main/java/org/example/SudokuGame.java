@@ -5,7 +5,7 @@ import org.example.exceptions.FixCellValueException;
 import org.example.exceptions.IllegalBlockStateException;
 import org.example.exceptions.InvalidMoveException;
 import org.example.exceptions.UserInputNumberOutOfRangeException;
-import org.example.models.SudokuBoard;
+import org.example.domains.SudokuBoard;
 import org.example.utils.SudokuUtils;
 
 import java.util.Scanner;

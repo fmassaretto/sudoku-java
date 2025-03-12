@@ -1,4 +1,4 @@
-package org.example.models;
+package org.example.domains;
 
 import org.example.exceptions.DuplicateValueException;
 import org.example.exceptions.FixCellValueException;
