@@ -1,6 +1,6 @@
-package org.example.utils;
+package com.fabiomassaretto.utils;
 
-import org.example.exceptions.IllegalBlockStateException;
+import com.fabiomassaretto.exceptions.IllegalBlockStateException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,9 +27,9 @@ public class SudokuUtils {
         throw new IllegalBlockStateException("For blocks total of " + totalBlocks + " cannot complete the sudoku board.");
     }
 
-    public List<String> readSudokuTemplateFile() {
+    public List<String> readSudokuTemplateFile(String path) {
         try {
-            return Files.readAllLines(Paths.get("Sudoku/src/main/resources/sudoku_templates/sudoku_template_3x3_1.txt"));
+            return Files.readAllLines(Paths.get(path));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

@@ -1,4 +1,4 @@
-package org.example.exceptions;
+package com.fabiomassaretto.exceptions;
 
 public class DuplicateValueException extends Exception{
 

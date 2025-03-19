@@ -1,6 +1,6 @@
-package org.example.domains;
+package com.fabiomassaretto.domains;
 
-import org.example.utils.SudokuUtils;
+import com.fabiomassaretto.utils.SudokuUtils;
 
 import java.util.ArrayList;
 import java.util.List;

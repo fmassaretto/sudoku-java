@@ -1,17 +1,14 @@
-package org.example.utils;
+package com.fabiomassaretto.utils;
 
-import org.example.exceptions.IllegalBlockStateException;
-import org.junit.jupiter.api.BeforeAll;
+import com.fabiomassaretto.exceptions.IllegalBlockStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

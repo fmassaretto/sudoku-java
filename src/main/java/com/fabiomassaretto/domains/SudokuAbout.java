@@ -1,4 +1,4 @@
-package org.example.domains;
+package com.fabiomassaretto.domains;
 
 public class SudokuAbout {
     private SudokuAbout() {

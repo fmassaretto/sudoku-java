@@ -1,22 +1,28 @@
-package org.example;
+package com.fabiomassaretto;
 
-import org.example.exceptions.DuplicateValueException;
-import org.example.exceptions.FixCellValueException;
-import org.example.exceptions.IllegalBlockStateException;
-import org.example.exceptions.InvalidMoveException;
-import org.example.exceptions.UserInputNumberOutOfRangeException;
-import org.example.domains.SudokuBoard;
-import org.example.utils.SudokuUtils;
+import com.fabiomassaretto.domains.GameStatus;
+import com.fabiomassaretto.exceptions.DuplicateValueException;
+import com.fabiomassaretto.exceptions.FixCellValueException;
+import com.fabiomassaretto.exceptions.IllegalBlockStateException;
+import com.fabiomassaretto.exceptions.InvalidMoveException;
+import com.fabiomassaretto.exceptions.UserInputNumberOutOfRangeException;
+import com.fabiomassaretto.domains.SudokuBoard;
+import com.fabiomassaretto.utils.SudokuUtils;
 
 import java.util.Scanner;
 
 public class SudokuGame {
     private final Scanner sc = new Scanner(System.in);
     private final SudokuBoard sudokuBoard;
-    short sudokuBoardSize = 9;
+    private GameStatus gameStatus;
+    private boolean exit = false;
+
 
     public SudokuGame() throws IllegalBlockStateException {
+        short sudokuBoardSize = 9;
         sudokuBoard = new SudokuBoard(sudokuBoardSize, new SudokuUtils());
+
+        this.gameStatus = GameStatus.STARTED;
     }
 
     public void start() {
@@ -26,7 +32,6 @@ public class SudokuGame {
     }
 
     private void gameMenu() {
-        boolean exit = false;
         while (!exit) {
             System.out.println();
             System.out.println("********* SUDOKU JAVA ********");
@@ -97,11 +102,38 @@ public class SudokuGame {
             int value = sc.nextInt();
 
             sudokuBoard.placeNumber(blockNumber, row, col, value);
+
+            checkGameWon();
+
+            if (gameStatus == GameStatus.WON) {
+                gameWon();
+                return;
+            }
         } catch (UserInputNumberOutOfRangeException | InvalidMoveException | DuplicateValueException e) {
             System.out.println();
             System.out.println(e.getMessage());
             System.out.println();
         }
         sudokuBoard.draw();
+    }
+
+    private void checkGameWon() {
+        gameStatus = sudokuBoard.gameWonStatus();
+    }
+
+    private void gameWon() {
+        exit = true;
+        System.out.println("\n\n");
+        wonMessageDisplay();
+        sudokuBoard.draw();
+        wonMessageDisplay();
+        System.out.println("\n\n");
+    }
+
+    private void wonMessageDisplay(){
+        System.out.println("                    ***************************");
+        System.out.println("                       Parabéns! Você venceu!  ");
+        System.out.println("                    ***************************");
+        System.out.println();
     }
 }

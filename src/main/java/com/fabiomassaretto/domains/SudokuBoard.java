@@ -1,15 +1,16 @@
-package org.example.domains;
+package com.fabiomassaretto.domains;
 
-import org.example.exceptions.DuplicateValueException;
-import org.example.exceptions.FixCellValueException;
-import org.example.exceptions.IllegalBlockStateException;
-import org.example.exceptions.InvalidMoveException;
-import org.example.exceptions.UserInputNumberOutOfRangeException;
-import org.example.utils.SudokuUtils;
+import com.fabiomassaretto.exceptions.DuplicateValueException;
+import com.fabiomassaretto.exceptions.FixCellValueException;
+import com.fabiomassaretto.exceptions.IllegalBlockStateException;
+import com.fabiomassaretto.exceptions.InvalidMoveException;
+import com.fabiomassaretto.exceptions.UserInputNumberOutOfRangeException;
+import com.fabiomassaretto.utils.SudokuUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -21,6 +22,8 @@ public class SudokuBoard extends SudokuUtils {
 
     private final short SUDOKU_BOARD_SIZE; // Size of sudoku board, e.g.: 3x3 = 9, 4x4 = 16 and so on
     private final int SUDOKU_BLOCKS_COUNT;
+    private final String SUDOKU_TEMPLATE_PATH = "Sudoku/src/main/resources/sudoku_templates/sudoku_template_3x3_1.txt";
+//    private final String SUDOKU_TEMPLATE_PATH = "Sudoku/src/main/resources/sudoku_templates/sudoku_template_3x3_1.txt";
 
     public SudokuBoard(short sudokuBoardSize, SudokuUtils sudokuUtils) throws IllegalBlockStateException {
         SUDOKU_BOARD_SIZE = sudokuBoardSize;
@@ -28,11 +31,11 @@ public class SudokuBoard extends SudokuUtils {
         this.sudokuUtils = sudokuUtils;
         this.sudokuBlocks = createSudokuBlocks();
 
-        fillSudokuBlockWithInitialSudokuCellFromTemplate();
+        fillSudokuBlockWithInitialSudokuCellFromTemplate(SUDOKU_TEMPLATE_PATH);
     }
 
-    private void fillSudokuBlockWithInitialSudokuCellFromTemplate() {
-        requireNonNull(readSudokuTemplateFile()).forEach(s -> {
+    private void fillSudokuBlockWithInitialSudokuCellFromTemplate(String path) {
+        requireNonNull(readSudokuTemplateFile(path)).forEach(s -> {
             if (!s.startsWith("#")) {
                 String[] lineSplit = s.split(",");
                 int blockNumber = Integer.parseInt(lineSplit[0]);
@@ -225,5 +228,17 @@ public class SudokuBoard extends SudokuUtils {
             System.out.print("    =======");
             System.out.println("===================".repeat(SUDOKU_BLOCKS_COUNT));
         }
+    }
+
+    public GameStatus gameWonStatus() {
+        AtomicReference<GameStatus> gameStatus = new AtomicReference<>(GameStatus.WON);
+        sudokuBlocks.forEach( block -> {
+            boolean hasNullValue = block.getSudokuCells().stream().anyMatch(cell -> cell.getValue() == null);
+
+            if (hasNullValue) {
+                gameStatus.set(GameStatus.NOT_WON);
+            }
+        });
+        return gameStatus.get();
     }
 }

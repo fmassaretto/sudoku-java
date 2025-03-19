@@ -1,17 +1,11 @@
-package org.example.domains;
+package com.fabiomassaretto.domains;
 
 public class SudokuCell {
-    private int index;
-    private int row;
-    private int col;
+    private final int index;
+    private final int row;
+    private final int col;
     private Integer value;
     private boolean isFixed;
-
-    public SudokuCell(int index, Integer value, boolean isFixed) {
-        this.index = index;
-        this.value = value;
-        this.isFixed = isFixed;
-    }
 
     public SudokuCell(int row, int col, int index, Integer value, boolean isFixed) {
         this.row = row;

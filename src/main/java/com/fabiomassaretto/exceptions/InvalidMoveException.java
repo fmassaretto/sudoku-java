@@ -1,4 +1,4 @@
-package org.example.exceptions;
+package com.fabiomassaretto.exceptions;
 
 public class InvalidMoveException extends Exception {
     public InvalidMoveException(String message) {

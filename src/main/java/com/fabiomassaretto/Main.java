@@ -1,9 +1,9 @@
-package org.example;
+package com.fabiomassaretto;
 
-import org.example.exceptions.IllegalBlockStateException;
-import org.example.domains.GameStatus;
-import org.example.domains.SudokuAbout;
-import org.example.domains.SudokuHelp;
+import com.fabiomassaretto.exceptions.IllegalBlockStateException;
+import com.fabiomassaretto.domains.GameStatus;
+import com.fabiomassaretto.domains.SudokuAbout;
+import com.fabiomassaretto.domains.SudokuHelp;
 
 import java.util.Scanner;
 

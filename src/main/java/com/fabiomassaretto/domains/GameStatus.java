@@ -1,8 +1,9 @@
-package org.example.domains;
+package com.fabiomassaretto.domains;
 
 public enum GameStatus {
     STARTED,
-    FINISHED,
+    NOT_WON,
+    WON,
     NOT_STARTED,
     EXITED
 }
