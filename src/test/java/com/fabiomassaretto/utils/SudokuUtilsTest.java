@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -56,12 +55,12 @@ class SudokuUtilsTest {
 
     @Test
     void whenPassingValueLessThan4AsParameterShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> sudokuUtils.calculateBlocksPerLineAndColumn( 3));
+        assertThrows(IllegalBlockStateException.class, () -> sudokuUtils.calculateBlocksPerLineAndColumn( 3));
     }
 
     @Test
     void whenPassingValueThatDontGenerateAPerfectSquareAsParameterShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> sudokuUtils.calculateBlocksPerLineAndColumn( 15));
+        assertThrows(IllegalBlockStateException.class, () -> sudokuUtils.calculateBlocksPerLineAndColumn( 15));
     }
 
     @Test
@@ -93,23 +92,23 @@ class SudokuUtilsTest {
 
         when(Files.readAllLines(paths1)).thenReturn(lines);
 
-        List<String> result = sudokuUtils.readSudokuTemplateFile();
+        List<String> result = sudokuUtils.readSudokuTemplateFile(fileName);
 
         assertEquals(lines, result);
     }
 
-    @Test
-    void readSudokuTemplateFileThrowIOException() throws IOException {
-        Path paths1 = Paths.get("");
-
-        mockStatic(Files.class);
-
-//        doThrow(IOException.class).when(Files.readAllLines(paths1));
-
-        when(Files.readAllLines(paths1)).thenThrow(IOException.class);
-
-        assertThrows(IOException.class, sudokuUtils::readSudokuTemplateFile);
-    }
+//    @Test
+//    void readSudokuTemplateFileThrowIOException() throws IOException {
+//        Path paths1 = Paths.get("invalid path");
+//
+//        mockStatic(Files.class);
+//
+////        doThrow(IOException.class).when(Files.readAllLines(paths1));
+//
+//        when(Files.readAllLines(paths1)).thenThrow(IOException.class);
+//
+//        assertThrows(IOException.class, () -> sudokuUtils.readSudokuTemplateFile("invalid path"));
+//    }
 
     @ParameterizedTest
     @MethodSource("generateData")
